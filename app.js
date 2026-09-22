@@ -3,7 +3,7 @@ const toys = await fetch('data/toys.json').then((response) => response.json());
 const quizQuestions = [
   { answer: 'Coo', image: toys[16].image }, { answer: 'Floppy', image: toys[26].image }, { answer: 'Malta Owl', image: toys[35].image }, { answer: 'Scoop', image: toys[57].image }, { answer: 'Wedges', image: toys[68].image }
 ];
-let quizOrder = [], quizIndex = 0, score = 0, puzzleToy = null, placedPieces = 0;
+let quizOrder = [], quizIndex = 0, score = 0, puzzleToy = null, puzzleState = [], puzzleMoves = 0;
 const $ = (selector) => document.querySelector(selector);
 
 function showView(route) {
@@ -48,7 +48,41 @@ function showResults() { $('.quiz-card').hidden = true; $('#score').textContent 
 
 function renderPuzzleChoices() { $('#puzzle-choices').innerHTML = toys.slice(0, 4).map((toy, index) => `<button class="puzzle-choice" data-puzzle="${index}"><img src="${toy.image}" alt=""><span><strong>${toy.name}</strong><span>${toy.detail}</span></span><span>↗</span></button>`).join(''); document.querySelectorAll('[data-puzzle]').forEach((button) => button.addEventListener('click', () => openPuzzle(toys[button.dataset.puzzle]))); }
 function resetPuzzleChoices() { $('#puzzle-stage').hidden = true; $('#puzzle-choices').hidden = false; }
-function openPuzzle(toy) { puzzleToy = toy; placedPieces = 0; $('#puzzle-choices').hidden = true; $('#puzzle-stage').hidden = false; $('#puzzle-progress').textContent = '0 / 9 placed'; const board = $('#puzzle-board'); board.innerHTML = ''; [...Array(9)].forEach((_, index) => { const piece = document.createElement('button'); piece.className = 'puzzle-piece'; piece.setAttribute('aria-label', `Puzzle piece ${index + 1}`); piece.style.backgroundImage = `url("${toy.image}")`; piece.style.backgroundPosition = `${(index % 3) * 50}% ${Math.floor(index / 3) * 50}%`; piece.addEventListener('click', () => { if (!piece.classList.contains('is-placed')) { piece.classList.add('is-placed'); placedPieces++; $('#puzzle-progress').textContent = `${placedPieces} / 9 placed`; if (placedPieces === 9) showToast('A new friend, assembled.'); } }); board.appendChild(piece); }); }
+function openPuzzle(toy) {
+  puzzleToy = toy; puzzleMoves = 0; puzzleState = [...Array(9).keys()];
+  let emptyIndex = 8;
+  for (let shuffle = 0; shuffle < 80; shuffle++) {
+    const neighbours = getPuzzleNeighbours(emptyIndex);
+    const nextIndex = neighbours[Math.floor(Math.random() * neighbours.length)];
+    [puzzleState[emptyIndex], puzzleState[nextIndex]] = [puzzleState[nextIndex], puzzleState[emptyIndex]];
+    emptyIndex = nextIndex;
+  }
+  if (puzzleState.every((piece, index) => piece === index)) return openPuzzle(toy);
+  $('#puzzle-choices').hidden = true; $('#puzzle-stage').hidden = false; renderPuzzleBoard();
+}
+function getPuzzleNeighbours(index) {
+  const row = Math.floor(index / 3); const column = index % 3; const neighbours = [];
+  if (row > 0) neighbours.push(index - 3); if (row < 2) neighbours.push(index + 3);
+  if (column > 0) neighbours.push(index - 1); if (column < 2) neighbours.push(index + 1);
+  return neighbours;
+}
+function renderPuzzleBoard() {
+  $('#puzzle-progress').textContent = `${puzzleMoves} move${puzzleMoves === 1 ? '' : 's'}`;
+  const board = $('#puzzle-board'); board.innerHTML = '';
+  puzzleState.forEach((pieceIndex, boardIndex) => {
+    const piece = document.createElement('button'); piece.className = 'puzzle-piece';
+    piece.setAttribute('aria-label', pieceIndex === 8 ? 'Empty puzzle space' : `Puzzle piece ${pieceIndex + 1}`);
+    if (pieceIndex === 8) { piece.classList.add('is-empty'); piece.disabled = true; }
+    else { piece.style.backgroundImage = `url("${puzzleToy.image}")`; piece.style.backgroundPosition = `${(pieceIndex % 3) * 50}% ${Math.floor(pieceIndex / 3) * 50}%`; piece.addEventListener('click', () => movePuzzlePiece(boardIndex)); }
+    board.appendChild(piece);
+  });
+}
+function movePuzzlePiece(index) {
+  const emptyIndex = puzzleState.indexOf(8);
+  if (!getPuzzleNeighbours(emptyIndex).includes(index)) return;
+  [puzzleState[emptyIndex], puzzleState[index]] = [puzzleState[index], puzzleState[emptyIndex]]; puzzleMoves++; renderPuzzleBoard();
+  if (puzzleState.every((piece, boardIndex) => piece === boardIndex)) showToast('A new friend, assembled.');
+}
 function showToast(message) { const toast = $('#toast'); toast.textContent = message; toast.classList.add('show'); clearTimeout(showToast.timeout); showToast.timeout = setTimeout(() => toast.classList.remove('show'), 1500); }
 
 renderCollection(); renderPuzzleChoices();
