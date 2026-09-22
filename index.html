@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f4ede3" />
+  <title>Soft Toy Stories</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="phone-shell" id="app">
+    <header class="topbar">
+      <button class="brand-button" data-route="home" aria-label="Back to home">
+        <span class="brand-mark">✦</span>
+        <span>STANDSHADOW SOFTTOYS</span>
+      </button>
+      <span class="edition">FIELD NOTES 01</span>
+    </header>
+
+    <section class="view is-active" id="home-view" data-view="home">
+      <div class="home-intro reveal">
+        <p class="eyebrow">A tiny world of very soft things</p>
+        <h1>Meet the<br /><em>cuddle club.</em></h1>
+        <p class="intro-copy">Wander through the collection, test your memory, or piece together a new friend.</p>
+      </div>
+      <nav class="main-options" aria-label="Main menu">
+        <button class="option-card collection-option reveal" data-route="collection">
+          <span class="option-number">01</span><span class="option-title">Collection</span><span class="arrow">↗</span>
+          <span class="option-note">A cabinet of soft curiosities</span>
+        </button>
+        <button class="option-card quiz-option reveal" data-route="quiz">
+          <span class="option-number">02</span><span class="option-title">Quiz</span><span class="arrow">↗</span>
+          <span class="option-note">Can you name them all?</span>
+        </button>
+        <button class="option-card puzzle-option reveal" data-route="puzzle">
+          <span class="option-number">03</span><span class="option-title">Puzzle</span><span class="arrow">↗</span>
+          <span class="option-note">Put a little joy together</span>
+        </button>
+      </nav>
+      <footer class="home-footer"><span>EST. 2024</span><span>MADE FOR SMALL SCREENS</span></footer>
+    </section>
+
+    <section class="view" id="collection-view" data-view="collection">
+      <div class="page-heading"><p class="eyebrow">The archive / 06 pieces</p><h2>A collection of<br /><em>good company.</em></h2></div>
+      <div class="toy-grid" id="toy-grid"></div>
+    </section>
+
+    <section class="view" id="quiz-view" data-view="quiz">
+      <div class="page-heading quiz-heading"><p class="eyebrow">Name that soft toy</p><div class="question-count" id="question-count">01 / 05</div><h2>Who is<br /><em>hiding here?</em></h2></div>
+      <div class="quiz-card">
+        <div class="quiz-image-wrap"><img id="quiz-image" src="" alt="A soft toy to identify" /><span class="image-label">MYSTERY TOY</span></div>
+        <p class="quiz-prompt">Choose their name</p>
+        <div class="answers" id="answers"></div>
+      </div>
+      <div class="quiz-result" id="quiz-result" hidden><p class="eyebrow">The results are in</p><strong><span id="score">0</span><small> / 5</small></strong><p id="result-message">A very respectable cuddle score.</p><button class="text-button" data-action="restart-quiz">Play again ↗</button></div>
+    </section>
+
+    <section class="view" id="puzzle-view" data-view="puzzle">
+      <div class="page-heading"><p class="eyebrow">A little assembly required</p><h2>Pick a friend,<br /><em>make a picture.</em></h2></div>
+      <div class="puzzle-choices" id="puzzle-choices"></div>
+      <div class="puzzle-stage" id="puzzle-stage" hidden>
+        <div class="puzzle-stage-top"><button class="back-link" data-action="back-puzzles">← all friends</button><span id="puzzle-progress">0 / 9 placed</span></div>
+        <p class="puzzle-instruction">Tap the pieces in order to reveal your soft toy.</p>
+        <div class="puzzle-board" id="puzzle-board"></div>
+        <button class="text-button" data-action="reset-puzzle">Shuffle again ↗</button>
+      </div>
+    </section>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
